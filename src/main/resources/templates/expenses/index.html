@@ -2,7 +2,7 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>支出一覧</title>
+    <title>家計簿</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -10,13 +10,30 @@
 <main class="container">
     <header class="page-header">
         <div>
-            <h1>支出一覧</h1>
-            <p class="summary" th:text="${#lists.size(expenses)} + '件'">0件</p>
+            <h1>家計簿</h1>
+            <p class="summary" th:text="'支出 ' + ${#lists.size(expenses)} + '件'">支出 0件</p>
         </div>
-        <button class="primary-button" type="button" data-open-expense-dialog>支出を登録</button>
+        <div class="header-actions">
+            <button class="secondary-button" type="button" data-open-income-dialog>収入を登録</button>
+            <button class="primary-button" type="button" data-open-expense-dialog>支出を登録</button>
+        </div>
     </header>
 
+    <section class="income-panel" aria-label="今月の収入">
+        <div>
+            <p class="panel-label">今月の収入</p>
+            <p class="income-amount">未登録</p>
+        </div>
+        <div class="income-meta">
+            <span>月1回の給与入力向け</span>
+            <button class="text-button" type="button" data-open-income-dialog>登録する</button>
+        </div>
+    </section>
+
     <section class="list-panel" aria-label="支出一覧">
+        <div class="section-header">
+            <h2>支出一覧</h2>
+        </div>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -43,7 +60,45 @@
         </div>
     </section>
 
-    <dialog id="expenseDialog" class="expense-dialog" th:attr="open=${showExpenseDialog} ? 'open' : null">
+    <dialog id="incomeDialog" class="entry-dialog">
+        <form class="dialog-form">
+            <div class="dialog-header">
+                <h2>収入を登録</h2>
+                <button class="icon-button" type="button" aria-label="閉じる" data-close-income-dialog>&times;</button>
+            </div>
+
+            <div class="form-row">
+                <label for="incomeMonth">対象月</label>
+                <input id="incomeMonth" name="incomeMonth" type="month">
+            </div>
+
+            <div class="form-row">
+                <label for="incomeAmount">金額</label>
+                <input id="incomeAmount" name="incomeAmount" type="number" min="1" inputmode="numeric" placeholder="例: 280000">
+            </div>
+
+            <div class="form-row">
+                <label for="incomeCategory">種類</label>
+                <select id="incomeCategory" name="incomeCategory">
+                    <option value="salary">給与</option>
+                    <option value="bonus">賞与</option>
+                    <option value="other">その他</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="incomeMemo">メモ</label>
+                <input id="incomeMemo" name="incomeMemo" type="text" maxlength="255" placeholder="例: 6月給与">
+            </div>
+
+            <div class="dialog-actions">
+                <button class="secondary-button" type="button" data-close-income-dialog>キャンセル</button>
+                <button class="primary-button" type="button" data-close-income-dialog>保存</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="expenseDialog" class="entry-dialog" th:attr="open=${showExpenseDialog} ? 'open' : null">
         <form class="dialog-form" th:action="@{/expenses}" th:object="${expenseForm}" method="post">
             <div class="dialog-header">
                 <h2>支出を登録</h2>
@@ -93,30 +148,37 @@
 </main>
 
 <script>
-    const expenseDialog = document.getElementById('expenseDialog');
-    const openButton = document.querySelector('[data-open-expense-dialog]');
-    const closeButtons = document.querySelectorAll('[data-close-expense-dialog]');
+    const setupDialog = (dialogId, openSelector, closeSelector) => {
+        const dialog = document.getElementById(dialogId);
+        const openButtons = document.querySelectorAll(openSelector);
+        const closeButtons = document.querySelectorAll(closeSelector);
 
-    openButton?.addEventListener('click', () => {
-        if (expenseDialog?.showModal) {
-            expenseDialog.showModal();
-        } else {
-            expenseDialog?.setAttribute('open', 'open');
-        }
-    });
-
-    closeButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            expenseDialog?.close?.();
-            expenseDialog?.removeAttribute('open');
+        openButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                if (dialog?.showModal) {
+                    dialog.showModal();
+                } else {
+                    dialog?.setAttribute('open', 'open');
+                }
+            });
         });
-    });
 
-    expenseDialog?.addEventListener('click', (event) => {
-        if (event.target === expenseDialog) {
-            expenseDialog.close();
-        }
-    });
+        closeButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                dialog?.close?.();
+                dialog?.removeAttribute('open');
+            });
+        });
+
+        dialog?.addEventListener('click', (event) => {
+            if (event.target === dialog) {
+                dialog.close();
+            }
+        });
+    };
+
+    setupDialog('incomeDialog', '[data-open-income-dialog]', '[data-close-income-dialog]');
+    setupDialog('expenseDialog', '[data-open-expense-dialog]', '[data-close-expense-dialog]');
 </script>
 </body>
 </html>
