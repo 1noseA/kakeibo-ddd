@@ -4,7 +4,7 @@ drop table if exists expenses;
 drop table if exists incomes;
 drop table if exists categories;
 
-// カテゴリー
+-- カテゴリー
 create table categories (
     id uuid primary key,
     name varchar(50) not null,
@@ -17,7 +17,7 @@ create table categories (
     constraint ck_categories_type check (type in ('INCOME', 'EXPENSE'))
 );
 
-// 収入
+-- 収入
 create table incomes (
     id uuid primary key,
     entry_date date not null,
@@ -35,7 +35,7 @@ create table incomes (
         check (amount > 0)
 );
 
-// 支出
+-- 支出
 create table expenses (
     id uuid primary key,
     entry_date date not null,
@@ -53,7 +53,7 @@ create table expenses (
         check (amount > 0)
 );
 
-// 月次予算
+-- 月次予算
 create table monthly_budgets (
     id uuid primary key,
     target_year int not null,
@@ -72,7 +72,7 @@ create table monthly_budgets (
         check (amount >= 0)
 );
 
-// カテゴリー予算
+-- カテゴリー予算
 create table category_budgets (
     id uuid primary key,
     target_year int not null,
