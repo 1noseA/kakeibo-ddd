@@ -35,6 +35,7 @@ public class ExpenseController {
     @GetMapping
     public String index(Model model) {
         model.addAttribute("expenseForm", new ExpenseForm());
+        model.addAttribute("showExpenseDialog", false);
         setupModel(model);
         return "expenses/index";
     }
@@ -46,6 +47,7 @@ public class ExpenseController {
             Model model
     ) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("showExpenseDialog", true);
             setupModel(model);
             return "expenses/index";
         }
@@ -59,6 +61,7 @@ public class ExpenseController {
             );
         } catch (IllegalArgumentException e) {
             bindingResult.reject("expense.record.error", e.getMessage());
+            model.addAttribute("showExpenseDialog", true);
             setupModel(model);
             return "expenses/index";
         }

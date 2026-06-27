@@ -2,37 +2,72 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>支出登録</title>
+    <title>支出一覧</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
 <main class="container">
-    <h1>支出登録</h1>
+    <header class="page-header">
+        <div>
+            <h1>支出一覧</h1>
+            <p class="summary" th:text="${#lists.size(expenses)} + '件'">0件</p>
+        </div>
+        <button class="primary-button" type="button" data-open-expense-dialog>支出を登録</button>
+    </header>
 
-    <section class="card">
-        <h2>支出を入力する</h2>
+    <section class="list-panel" aria-label="支出一覧">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>カテゴリ</th>
+                    <th>メモ</th>
+                    <th class="amount">金額</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="expense : ${expenses}">
+                    <td class="date" th:text="${expense.entryDate()}"></td>
+                    <td th:text="${expense.categoryName()}"></td>
+                    <td class="memo" th:text="${expense.memo()}"></td>
+                    <td class="amount" th:text="${#numbers.formatInteger(expense.amount(), 0, 'COMMA')} + '円'"></td>
+                </tr>
 
-        <form th:action="@{/expenses}" th:object="${expenseForm}" method="post">
+                <tr th:if="${#lists.isEmpty(expenses)}">
+                    <td colspan="4" class="empty">まだ支出が登録されていません。</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <dialog id="expenseDialog" class="expense-dialog" th:attr="open=${showExpenseDialog} ? 'open' : null">
+        <form class="dialog-form" th:action="@{/expenses}" th:object="${expenseForm}" method="post">
+            <div class="dialog-header">
+                <h2>支出を登録</h2>
+                <button class="icon-button" type="button" aria-label="閉じる" data-close-expense-dialog>&times;</button>
+            </div>
 
             <div class="error" th:if="${#fields.hasGlobalErrors()}">
                 <div th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
             </div>
 
             <div class="form-row">
-                <label for="entryDate">支出日</label>
+                <label for="entryDate">日付</label>
                 <input id="entryDate" type="date" th:field="*{entryDate}">
                 <div class="error" th:if="${#fields.hasErrors('entryDate')}" th:errors="*{entryDate}"></div>
             </div>
 
             <div class="form-row">
                 <label for="amount">金額</label>
-                <input id="amount" type="number" th:field="*{amount}" min="1">
+                <input id="amount" type="number" th:field="*{amount}" min="1" inputmode="numeric">
                 <div class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
             </div>
 
             <div class="form-row">
-                <label for="categoryId">カテゴリー</label>
+                <label for="categoryId">カテゴリ</label>
                 <select id="categoryId" th:field="*{categoryId}">
                     <option value="">選択してください</option>
                     <option
@@ -49,39 +84,39 @@
                 <input id="memo" type="text" th:field="*{memo}" maxlength="255">
             </div>
 
-            <div class="actions">
-                <button type="submit">登録する</button>
+            <div class="dialog-actions">
+                <button class="secondary-button" type="button" data-close-expense-dialog>キャンセル</button>
+                <button class="primary-button" type="submit">登録</button>
             </div>
         </form>
-    </section>
-
-    <section class="card">
-        <h2>支出一覧</h2>
-
-        <table>
-            <thead>
-            <tr>
-                <th>日付</th>
-                <th>金額</th>
-                <th>カテゴリー</th>
-                <th>メモ</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="expense : ${expenses}">
-                <td th:text="${expense.entryDate()}"></td>
-                <td class="amount" th:text="${#numbers.formatInteger(expense.amount(), 0, 'COMMA')} + '円'"></td>
-                <td th:text="${expense.categoryName()}"></td>
-                <td th:text="${expense.memo()}"></td>
-            </tr>
-
-            <tr th:if="${#lists.isEmpty(expenses)}">
-                <td colspan="4" class="empty">まだ支出が登録されていません。</td>
-            </tr>
-            </tbody>
-        </table>
-    </section>
+    </dialog>
 </main>
 
+<script>
+    const expenseDialog = document.getElementById('expenseDialog');
+    const openButton = document.querySelector('[data-open-expense-dialog]');
+    const closeButtons = document.querySelectorAll('[data-close-expense-dialog]');
+
+    openButton?.addEventListener('click', () => {
+        if (expenseDialog?.showModal) {
+            expenseDialog.showModal();
+        } else {
+            expenseDialog?.setAttribute('open', 'open');
+        }
+    });
+
+    closeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            expenseDialog?.close?.();
+            expenseDialog?.removeAttribute('open');
+        });
+    });
+
+    expenseDialog?.addEventListener('click', (event) => {
+        if (event.target === expenseDialog) {
+            expenseDialog.close();
+        }
+    });
+</script>
 </body>
 </html>
