@@ -227,11 +227,16 @@ button {
 }
 
 .entry-dialog {
+    position: fixed;
+    inset: 0;
     width: min(440px, calc(100% - 32px));
+    max-height: calc(100vh - 32px);
+    margin: auto;
     padding: 0;
     border: 0;
     border-radius: 8px;
     box-shadow: 0 24px 60px rgba(16, 24, 40, 0.22);
+    overflow-y: auto;
 }
 
 .entry-dialog::backdrop {

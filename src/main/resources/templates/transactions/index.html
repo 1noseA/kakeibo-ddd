@@ -203,6 +203,12 @@
         const dialog = document.getElementById(dialogId);
         const openButtons = document.querySelectorAll(openSelector);
         const closeButtons = document.querySelectorAll(closeSelector);
+        const clearErrors = () => {
+            dialog?.querySelectorAll('.error').forEach((error) => {
+                error.textContent = '';
+                error.hidden = true;
+            });
+        };
 
         openButtons.forEach((button) => {
             button.addEventListener('click', () => {
@@ -216,6 +222,7 @@
 
         closeButtons.forEach((button) => {
             button.addEventListener('click', () => {
+                clearErrors();
                 dialog?.close?.();
                 dialog?.removeAttribute('open');
             });
@@ -223,9 +230,15 @@
 
         dialog?.addEventListener('click', (event) => {
             if (event.target === dialog) {
+                clearErrors();
                 dialog.close();
             }
         });
+
+        if (dialog?.hasAttribute('open') && dialog?.showModal) {
+            dialog.removeAttribute('open');
+            dialog.showModal();
+        }
     };
 
     setupDialog('incomeDialog', '[data-open-income-dialog]', '[data-close-income-dialog]');
