@@ -21,12 +21,29 @@
 
     <section class="income-panel" aria-label="今月の収入">
         <div>
-            <p class="panel-label">今月の収入</p>
-            <p class="income-amount">未登録</p>
+            <p class="panel-label" th:text="|${targetMonth.year}年${targetMonth.monthValue}月の収入|">今月の収入</p>
+            <p class="income-amount" th:if="${incomeTotal == 0}">未登録</p>
+            <p
+                    class="income-amount"
+                    th:unless="${incomeTotal == 0}"
+                    th:text="${#numbers.formatInteger(incomeTotal, 0, 'COMMA')} + '円'">
+                0円
+            </p>
         </div>
         <div class="income-meta">
-            <span>月1回の給与入力向け</span>
-            <button class="text-button" type="button" data-open-income-dialog>登録する</button>
+            <span th:if="${incomeTotal == 0}">月1回の給与入力向け</span>
+            <span
+                    th:unless="${incomeTotal == 0}"
+                    th:text="|${targetMonth.year}年${targetMonth.monthValue}月の合計|">
+                今月の合計
+            </span>
+            <button
+                    class="text-button"
+                    type="button"
+                    data-open-income-dialog
+                    th:text="${incomeTotal == 0} ? '登録する' : '追加する'">
+                登録する
+            </button>
         </div>
     </section>
 
@@ -60,46 +77,56 @@
         </div>
     </section>
 
-    <dialog id="incomeDialog" class="entry-dialog">
-        <form class="dialog-form">
+    <dialog id="incomeDialog" class="entry-dialog" th:attr="open=${showIncomeDialog} ? 'open' : null">
+        <form class="dialog-form" th:action="@{/transactions/incomes}" th:object="${incomeForm}" method="post">
             <div class="dialog-header">
                 <h2>収入を登録</h2>
                 <button class="icon-button" type="button" aria-label="閉じる" data-close-income-dialog>&times;</button>
             </div>
 
+            <div class="error" th:if="${#fields.hasGlobalErrors()}">
+                <div th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
+            </div>
+
             <div class="form-row">
-                <label for="incomeMonth">対象月</label>
-                <input id="incomeMonth" name="incomeMonth" type="month">
+                <label for="incomeEntryDate">日付</label>
+                <input id="incomeEntryDate" type="date" th:field="*{entryDate}">
+                <div class="error" th:if="${#fields.hasErrors('entryDate')}" th:errors="*{entryDate}"></div>
             </div>
 
             <div class="form-row">
                 <label for="incomeAmount">金額</label>
-                <input id="incomeAmount" name="incomeAmount" type="number" min="1" inputmode="numeric" placeholder="例: 280000">
+                <input id="incomeAmount" type="number" th:field="*{amount}" min="1" inputmode="numeric" placeholder="例: 280000">
+                <div class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
             </div>
 
             <div class="form-row">
-                <label for="incomeCategory">種類</label>
-                <select id="incomeCategory" name="incomeCategory">
-                    <option value="salary">給与</option>
-                    <option value="bonus">賞与</option>
-                    <option value="other">その他</option>
+                <label for="incomeCategoryId">カテゴリ</label>
+                <select id="incomeCategoryId" th:field="*{categoryId}">
+                    <option value="">選択してください</option>
+                    <option
+                            th:each="category : ${incomeCategories}"
+                            th:value="${category.id().value()}"
+                            th:text="${category.name()}">
+                    </option>
                 </select>
+                <div class="error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
             </div>
 
             <div class="form-row">
                 <label for="incomeMemo">メモ</label>
-                <input id="incomeMemo" name="incomeMemo" type="text" maxlength="255" placeholder="例: 6月給与">
+                <input id="incomeMemo" type="text" th:field="*{memo}" maxlength="255" placeholder="例: 6月給与">
             </div>
 
             <div class="dialog-actions">
                 <button class="secondary-button" type="button" data-close-income-dialog>キャンセル</button>
-                <button class="primary-button" type="button" data-close-income-dialog>保存</button>
+                <button class="primary-button" type="submit">保存</button>
             </div>
         </form>
     </dialog>
 
     <dialog id="expenseDialog" class="entry-dialog" th:attr="open=${showExpenseDialog} ? 'open' : null">
-        <form class="dialog-form" th:action="@{/transactions}" th:object="${expenseForm}" method="post">
+        <form class="dialog-form" th:action="@{/transactions/expenses}" th:object="${expenseForm}" method="post">
             <div class="dialog-header">
                 <h2>支出を登録</h2>
                 <button class="icon-button" type="button" aria-label="閉じる" data-close-expense-dialog>&times;</button>
@@ -126,7 +153,7 @@
                 <select id="categoryId" th:field="*{categoryId}">
                     <option value="">選択してください</option>
                     <option
-                            th:each="category : ${categories}"
+                            th:each="category : ${expenseCategories}"
                             th:value="${category.id().value()}"
                             th:text="${category.name()}">
                     </option>

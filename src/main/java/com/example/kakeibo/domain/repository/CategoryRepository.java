@@ -10,5 +10,7 @@ public interface CategoryRepository {
 
     Optional<Category> findById(UUID id);
 
+    List<Category> findIncomeCategories();
+
     List<Category> findExpenseCategories();
 }

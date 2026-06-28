@@ -27,6 +27,14 @@ public class MyBatisCategoryRepository implements CategoryRepository {
     }
 
     @Override
+    public List<Category> findIncomeCategories() {
+        return mapper.findIncomeCategories()
+                .stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
+    @Override
     public List<Category> findExpenseCategories() {
         return mapper.findExpenseCategories()
                 .stream()

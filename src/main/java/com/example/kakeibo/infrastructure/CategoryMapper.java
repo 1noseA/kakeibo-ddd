@@ -12,5 +12,7 @@ public interface CategoryMapper {
 
     Optional<CategoryRecord> findById(@Param("id") UUID id);
 
+    List<CategoryRecord> findIncomeCategories();
+
     List<CategoryRecord> findExpenseCategories();
 }

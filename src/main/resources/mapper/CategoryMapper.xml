@@ -15,6 +15,18 @@
         where id = #{id}
     </select>
 
+    <select id="findIncomeCategories" resultType="com.example.kakeibo.infrastructure.CategoryRecord">
+        select
+            id,
+            name,
+            type,
+            active
+        from categories
+        where type = 'INCOME'
+          and active = true
+        order by id
+    </select>
+
     <select id="findExpenseCategories" resultType="com.example.kakeibo.infrastructure.CategoryRecord">
         select
             id,

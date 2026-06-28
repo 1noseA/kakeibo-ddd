@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.kakeibo.infrastructure.IncomeMapper">
+
+    <insert id="insert">
+        insert into incomes (
+            id,
+            entry_date,
+            amount,
+            category_id,
+            memo,
+            created_at,
+            updated_at
+        ) values (
+            #{id},
+            #{entryDate},
+            #{amount},
+            #{categoryId},
+            #{memo},
+            current_timestamp,
+            current_timestamp
+        )
+    </insert>
+
+    <select id="findAllForList" resultType="com.example.kakeibo.infrastructure.IncomeRecord">
+        select
+            i.id,
+            i.entry_date,
+            i.amount,
+            c.name as category_name,
+            i.memo
+        from incomes i
+        inner join categories c
+            on i.category_id = c.id
+        order by i.entry_date desc, i.created_at desc
+    </select>
+
+    <select id="sumAmountByEntryDateRange" resultType="int">
+        select
+            coalesce(sum(amount), 0)
+        from incomes
+        where entry_date >= #{startDate}
+          and entry_date &lt; #{endDate}
+    </select>
+
+</mapper>
