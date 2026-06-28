@@ -99,7 +99,7 @@
     </dialog>
 
     <dialog id="expenseDialog" class="entry-dialog" th:attr="open=${showExpenseDialog} ? 'open' : null">
-        <form class="dialog-form" th:action="@{/expenses}" th:object="${expenseForm}" method="post">
+        <form class="dialog-form" th:action="@{/transactions}" th:object="${expenseForm}" method="post">
             <div class="dialog-header">
                 <h2>支出を登録</h2>
                 <button class="icon-button" type="button" aria-label="閉じる" data-close-expense-dialog>&times;</button>

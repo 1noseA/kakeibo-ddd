@@ -15,14 +15,14 @@ import com.example.kakeibo.application.RecordExpenseUseCase;
 import com.example.kakeibo.domain.repository.CategoryRepository;
 
 @Controller
-@RequestMapping("/expenses")
-public class ExpenseController {
+@RequestMapping("/transactions")
+public class TransactionController {
 
     private final RecordExpenseUseCase recordExpenseUseCase;
     private final GetExpenseListUseCase getExpenseListUseCase;
     private final CategoryRepository categoryRepository;
 
-    public ExpenseController(
+    public TransactionController(
             RecordExpenseUseCase recordExpenseUseCase,
             GetExpenseListUseCase getExpenseListUseCase,
             CategoryRepository categoryRepository
@@ -37,7 +37,7 @@ public class ExpenseController {
         model.addAttribute("expenseForm", new ExpenseForm());
         model.addAttribute("showExpenseDialog", false);
         setupModel(model);
-        return "expenses/index";
+        return "transactions/index";
     }
 
     @PostMapping
@@ -49,7 +49,7 @@ public class ExpenseController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("showExpenseDialog", true);
             setupModel(model);
-            return "expenses/index";
+            return "transactions/index";
         }
 
         try {
@@ -63,10 +63,10 @@ public class ExpenseController {
             bindingResult.reject("expense.record.error", e.getMessage());
             model.addAttribute("showExpenseDialog", true);
             setupModel(model);
-            return "expenses/index";
+            return "transactions/index";
         }
 
-        return "redirect:/expenses";
+        return "redirect:/transactions";
     }
 
     private void setupModel(Model model) {
