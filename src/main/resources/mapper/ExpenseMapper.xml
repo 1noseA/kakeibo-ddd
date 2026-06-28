@@ -35,7 +35,7 @@
         from expenses e
         inner join categories c
             on e.category_id = c.id
-        order by e.entry_date desc, e.created_at desc
+        order by e.entry_date, e.created_at
     </select>
 
 </mapper>
