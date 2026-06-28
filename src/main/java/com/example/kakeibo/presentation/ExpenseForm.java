@@ -14,14 +14,14 @@ import lombok.Setter;
 @Setter
 public class ExpenseForm {
 
-    @NotNull
+    @NotNull(message = "日付を入力してください。")
     @PastOrPresent(message = "未来の日付は指定できません。")
     private LocalDate entryDate = LocalDate.now();
 
-    @Min(1)
+    @Min(value = 1, message = "金額は1円以上で入力してください。")
     private int amount;
 
-    @NotNull
+    @NotNull(message = "カテゴリを選択してください。")
     private UUID categoryId;
 
     private String memo;
