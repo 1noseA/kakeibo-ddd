@@ -27,6 +27,24 @@ body {
     gap: 10px;
 }
 
+.month-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    color: #344054;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.month-navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    text-decoration: none;
+}
+
 h1,
 h2,
 p {
@@ -272,6 +290,7 @@ select:focus {
     }
 
     .header-actions,
+    .month-navigation,
     .income-panel,
     .income-meta {
         align-items: stretch;

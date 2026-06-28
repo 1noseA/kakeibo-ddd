@@ -1,6 +1,8 @@
 package com.example.kakeibo.presentation;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 
 import jakarta.validation.Valid;
 
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.kakeibo.application.GetExpenseListUseCase;
 import com.example.kakeibo.application.GetMonthlyIncomeTotalUseCase;
@@ -44,10 +47,15 @@ public class TransactionController {
 
     // 取引画面の初期表示
     @GetMapping
-    public String index(Model model) {
+    public String index(
+            @RequestParam(name = "month", required = false) String month,
+            Model model
+    ) {
+        YearMonth targetMonth = parseTargetMonth(month);
+
         model.addAttribute("showIncomeDialog", false);
         model.addAttribute("showExpenseDialog", false);
-        setupModel(model);
+        setupModel(model, targetMonth);
         return "transactions/index";
     }
 
@@ -58,10 +66,12 @@ public class TransactionController {
             BindingResult bindingResult,
             Model model
     ) {
+        YearMonth targetMonth = targetMonthOf(incomeForm.getEntryDate());
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("showIncomeDialog", true);
             model.addAttribute("showExpenseDialog", false);
-            setupModel(model);
+            setupModel(model, targetMonth);
             return "transactions/index";
         }
 
@@ -76,11 +86,11 @@ public class TransactionController {
             bindingResult.reject("income.record.error", e.getMessage());
             model.addAttribute("showIncomeDialog", true);
             model.addAttribute("showExpenseDialog", false);
-            setupModel(model);
+            setupModel(model, targetMonth);
             return "transactions/index";
         }
 
-        return "redirect:/transactions";
+        return "redirect:/transactions?month=" + targetMonth;
     }
 
     // 支出登録
@@ -90,10 +100,12 @@ public class TransactionController {
             BindingResult bindingResult,
             Model model
     ) {
+        YearMonth targetMonth = targetMonthOf(expenseForm.getEntryDate());
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("showIncomeDialog", false);
             model.addAttribute("showExpenseDialog", true);
-            setupModel(model);
+            setupModel(model, targetMonth);
             return "transactions/index";
         }
 
@@ -108,28 +120,52 @@ public class TransactionController {
             bindingResult.reject("expense.record.error", e.getMessage());
             model.addAttribute("showIncomeDialog", false);
             model.addAttribute("showExpenseDialog", true);
-            setupModel(model);
+            setupModel(model, targetMonth);
             return "transactions/index";
         }
 
-        return "redirect:/transactions";
+        return "redirect:/transactions?month=" + targetMonth;
     }
 
     // 画面共通のModel
-    private void setupModel(Model model) {
-        YearMonth targetMonth = YearMonth.now();
-
+    private void setupModel(Model model, YearMonth targetMonth) {
         if (!model.containsAttribute("incomeForm")) {
-            model.addAttribute("incomeForm", new IncomeForm());
+            IncomeForm incomeForm = new IncomeForm();
+            incomeForm.setEntryDate(targetMonth.atDay(1));
+            model.addAttribute("incomeForm", incomeForm);
         }
         if (!model.containsAttribute("expenseForm")) {
-            model.addAttribute("expenseForm", new ExpenseForm());
+            ExpenseForm expenseForm = new ExpenseForm();
+            expenseForm.setEntryDate(targetMonth.atDay(1));
+            model.addAttribute("expenseForm", expenseForm);
         }
 
         model.addAttribute("incomeCategories", categoryRepository.findIncomeCategories());
         model.addAttribute("expenseCategories", categoryRepository.findExpenseCategories());
         model.addAttribute("targetMonth", targetMonth);
+        model.addAttribute("previousMonth", targetMonth.minusMonths(1));
+        model.addAttribute("nextMonth", targetMonth.plusMonths(1));
         model.addAttribute("incomeTotal", getMonthlyIncomeTotalUseCase.handle(targetMonth));
-        model.addAttribute("expenses", getExpenseListUseCase.handle());
+        model.addAttribute("expenses", getExpenseListUseCase.handle(targetMonth));
+    }
+
+    private YearMonth parseTargetMonth(String month) {
+        if (month == null || month.isBlank()) {
+            return YearMonth.now();
+        }
+
+        try {
+            return YearMonth.parse(month);
+        } catch (DateTimeParseException e) {
+            return YearMonth.now();
+        }
+    }
+
+    private YearMonth targetMonthOf(LocalDate entryDate) {
+        if (entryDate == null) {
+            return YearMonth.now();
+        }
+
+        return YearMonth.from(entryDate);
     }
 }

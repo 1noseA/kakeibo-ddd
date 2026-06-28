@@ -11,7 +11,7 @@
     <header class="page-header">
         <div>
             <h1>家計簿</h1>
-            <p class="summary" th:text="'支出 ' + ${#lists.size(expenses)} + '件'">支出 0件</p>
+            <p class="summary" th:text="|支出 ${#lists.size(expenses)}件|">支出 0件</p>
         </div>
         <div class="header-actions">
             <button class="secondary-button" type="button" data-open-income-dialog>収入を登録</button>
@@ -19,9 +19,15 @@
         </div>
     </header>
 
-    <section class="income-panel" aria-label="今月の収入">
+    <nav class="month-navigation" aria-label="月の切り替え">
+        <a class="secondary-button" th:href="@{/transactions(month=${previousMonth})}">前月</a>
+        <span th:text="|${targetMonth.year}年${targetMonth.monthValue}月|">今月</span>
+        <a class="secondary-button" th:href="@{/transactions(month=${nextMonth})}">次月</a>
+    </nav>
+
+    <section class="income-panel" aria-label="収入">
         <div>
-            <p class="panel-label" th:text="|${targetMonth.year}年${targetMonth.monthValue}月の収入|">今月の収入</p>
+            <p class="panel-label">収入</p>
             <p class="income-amount" th:if="${incomeTotal == 0}">未登録</p>
             <p
                     class="income-amount"
@@ -31,12 +37,6 @@
             </p>
         </div>
         <div class="income-meta">
-            <span th:if="${incomeTotal == 0}">月1回の給与入力向け</span>
-            <span
-                    th:unless="${incomeTotal == 0}"
-                    th:text="|${targetMonth.year}年${targetMonth.monthValue}月の合計|">
-                今月の合計
-            </span>
             <button
                     class="text-button"
                     type="button"

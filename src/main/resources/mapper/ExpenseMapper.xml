@@ -25,7 +25,7 @@
         )
     </insert>
 
-    <select id="findAllForList" resultType="com.example.kakeibo.infrastructure.ExpenseRecord">
+    <select id="findForListByEntryDateRange" resultType="com.example.kakeibo.infrastructure.ExpenseRecord">
         select
             e.id,
             e.entry_date,
@@ -35,6 +35,8 @@
         from expenses e
         inner join categories c
             on e.category_id = c.id
+        where e.entry_date >= #{startDate}
+          and e.entry_date &lt; #{endDate}
         order by e.entry_date, e.created_at
     </select>
 

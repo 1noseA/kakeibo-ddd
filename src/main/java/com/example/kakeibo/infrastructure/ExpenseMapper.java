@@ -18,5 +18,8 @@ public interface ExpenseMapper {
             @Param("memo") String memo
     );
 
-    List<ExpenseRecord> findAllForList();
+    List<ExpenseRecord> findForListByEntryDateRange(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }
