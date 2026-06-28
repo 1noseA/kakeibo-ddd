@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 public class ExpenseForm {
 
     @NotNull
+    @PastOrPresent(message = "未来の日付は指定できません。")
     private LocalDate entryDate = LocalDate.now();
 
     @Min(1)

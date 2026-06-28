@@ -9,6 +9,9 @@ public record EntryDate(LocalDate value) {
         if (value == null) {
             throw new IllegalArgumentException("記録日は必須です。");
         }
+        if (value.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("未来の日付は指定できません。");
+        }
     }
 
     public TargetMonth toTargetMonth() {
