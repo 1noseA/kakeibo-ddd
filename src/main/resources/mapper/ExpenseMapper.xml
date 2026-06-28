@@ -39,5 +39,13 @@
           and e.entry_date &lt; #{endDate}
         order by e.entry_date, e.created_at
     </select>
+    
+    <select id="sumAmountByEntryDateRange" resultType="int">
+        select
+            coalesce(sum(amount), 0)
+        from expenses
+        where entry_date >= #{startDate}
+          and entry_date &lt; #{endDate}
+    </select>
 
 </mapper>

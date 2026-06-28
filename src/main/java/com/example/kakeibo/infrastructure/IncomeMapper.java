@@ -1,7 +1,6 @@
 package com.example.kakeibo.infrastructure;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -17,8 +16,6 @@ public interface IncomeMapper {
             @Param("categoryId") UUID categoryId,
             @Param("memo") String memo
     );
-
-    List<IncomeRecord> findAllForList();
 
     int sumAmountByEntryDateRange(
             @Param("startDate") LocalDate startDate,

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.kakeibo.application.GetExpenseListUseCase;
+import com.example.kakeibo.application.GetMonthlyExpenseTotalUseCase;
 import com.example.kakeibo.application.GetMonthlyIncomeTotalUseCase;
 import com.example.kakeibo.application.RecordExpenseUseCase;
 import com.example.kakeibo.application.RecordIncomeUseCase;
@@ -28,6 +29,7 @@ public class TransactionController {
     private final RecordIncomeUseCase recordIncomeUseCase;
     private final RecordExpenseUseCase recordExpenseUseCase;
     private final GetMonthlyIncomeTotalUseCase getMonthlyIncomeTotalUseCase;
+    private final GetMonthlyExpenseTotalUseCase getMonthlyExpenseTotalUseCase;
     private final GetExpenseListUseCase getExpenseListUseCase;
     private final CategoryRepository categoryRepository;
 
@@ -35,12 +37,14 @@ public class TransactionController {
             RecordIncomeUseCase recordIncomeUseCase,
             RecordExpenseUseCase recordExpenseUseCase,
             GetMonthlyIncomeTotalUseCase getMonthlyIncomeTotalUseCase,
+            GetMonthlyExpenseTotalUseCase getMonthlyExpenseTotalUseCase,
             GetExpenseListUseCase getExpenseListUseCase,
             CategoryRepository categoryRepository
     ) {
         this.recordIncomeUseCase = recordIncomeUseCase;
         this.recordExpenseUseCase = recordExpenseUseCase;
         this.getMonthlyIncomeTotalUseCase = getMonthlyIncomeTotalUseCase;
+        this.getMonthlyExpenseTotalUseCase = getMonthlyExpenseTotalUseCase;
         this.getExpenseListUseCase = getExpenseListUseCase;
         this.categoryRepository = categoryRepository;
     }
@@ -146,6 +150,7 @@ public class TransactionController {
         model.addAttribute("previousMonth", targetMonth.minusMonths(1));
         model.addAttribute("nextMonth", targetMonth.plusMonths(1));
         model.addAttribute("incomeTotal", getMonthlyIncomeTotalUseCase.handle(targetMonth));
+        model.addAttribute("expenseTotal", getMonthlyExpenseTotalUseCase.handle(targetMonth));
         model.addAttribute("expenses", getExpenseListUseCase.handle(targetMonth));
     }
 
