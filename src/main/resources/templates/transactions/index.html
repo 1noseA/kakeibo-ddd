@@ -25,18 +25,18 @@
         <a class="secondary-button" th:href="@{/transactions(month=${nextMonth})}">次月</a>
     </nav>
 
-    <section class="income-panel" aria-label="収入">
-        <div>
-            <p class="panel-label">収入</p>
-            <p class="income-amount" th:if="${incomeTotal == 0}">未登録</p>
-            <p
-                    class="income-amount"
-                    th:unless="${incomeTotal == 0}"
-                    th:text="${#numbers.formatInteger(incomeTotal, 0, 'COMMA')} + '円'">
-                0円
-            </p>
-        </div>
-        <div class="income-meta">
+    <section class="monthly-summary" aria-label="月次サマリー">
+        <div class="summary-item income-summary">
+            <div>
+                <p class="panel-label">収入</p>
+                <p class="summary-amount" th:if="${incomeTotal == 0}">未登録</p>
+                <p
+                        class="summary-amount"
+                        th:unless="${incomeTotal == 0}"
+                        th:text="${#numbers.formatInteger(incomeTotal, 0, 'COMMA')} + '円'">
+                    0円
+                </p>
+            </div>
             <button
                     class="text-button"
                     type="button"
@@ -44,6 +44,30 @@
                     th:text="${incomeTotal == 0} ? '登録する' : '追加する'">
                 登録する
             </button>
+        </div>
+
+        <div class="summary-item expense-summary">
+            <div>
+                <p class="panel-label">支出</p>
+                <p
+                        class="summary-amount"
+                        th:text="${#numbers.formatInteger(expenseTotal ?: 0, 0, 'COMMA')} + '円'">
+                    0円
+                </p>
+            </div>
+            <button class="text-button" type="button" data-open-expense-dialog>追加する</button>
+        </div>
+
+        <div class="summary-item balance-summary">
+            <div>
+                <p class="panel-label">収支</p>
+                <p
+                        class="summary-amount"
+                        th:text="${#numbers.formatInteger(balance ?: 0, 0, 'COMMA')} + '円'">
+                    0円
+                </p>
+            </div>
+            <p class="summary-note">収入 - 支出</p>
         </div>
     </section>
 
